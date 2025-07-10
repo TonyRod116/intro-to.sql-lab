@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Details</title>
+</head>
+<body>
+  <h1><%= professional.name %></h1>
+  <ul>
+      <li><strong>Type:</strong> <%= professional.type %></li>
+      <li>
+          <strong>Valuation:</strong>
+          <ul>
+              <% professional.valuation.forEach(function(val) { %>
+                  <li><%= val %></li>
+              <% }) %>
+          </ul>
+      </li>
+      <li><strong>Description:</strong> <%= professional.description %></li>
+      <li><strong>Location:</strong> <%= professional.location %></li>
+      <li><strong>Contact:</strong> <%= professional.contact %></li>
+      <li>
+          <strong>Tags:</strong>
+          <ul>
+              <% professional.tags.forEach(function(tag) { %>
+                  <li><%= tag %></li>
+              <% }) %>
+          </ul>
+      </li>
+  </ul>
+  <a href="/professionals">Back to list</a>
+  <a href="/professionals/<%= professional._id %>/edit">Edit</a>
+  <form action="/professionals/<%= professional._id %>?_method=DELETE" method="POST" style="display:inline;">
+      <button type="submit" onclick="return confirm('¿Seguro que quieres borrar este profesional?')">Delete</button>
+  </form>
+</body>
+</html>

@@ -12,7 +12,7 @@
         <% professionals.forEach(professional => { %>
             <li>
                 <a href="/professionals/<%= professional._id %>">
-                    <%= professional.name %> - <%= professional.type %>
+                    <%= professional.name %> - <%= professional.type %> - <%= professional.valuation %>
                 </a>
             </li>
         <% }) %>

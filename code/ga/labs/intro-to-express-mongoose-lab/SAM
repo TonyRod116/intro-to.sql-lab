@@ -1,0 +1,109 @@
+import express from 'express'
+import mongoose from 'mongoose'
+import morgan from 'morgan'
+import 'dotenv/config'
+import methodOverride from 'method-override'
+
+const app = express()
+const port = process.env.PORT
+
+// * Middleware
+app.use(express.urlencoded()) // Without this line, all payload data will be undefined in our routes
+app.use(morgan('dev'))
+app.use(methodOverride('_method'))
+
+// * Schema & Model
+// The schema allows us to create a blueprint for a document that will exist in a specified collection in our database
+// We will define the fields we want for each object added
+const bookSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  author: { type: String, required: true },
+  releaseYear: String,
+  genres: [{ type: String }]
+})
+
+const Book = mongoose.model('Book', bookSchema)
+
+// * Home page
+app.get('/', (req, res) => {
+  return res.render('home.ejs')
+})
+
+// * Index
+app.get('/books', async (req, res) => {
+  try {
+    const books = await Book.find()
+    return res.render('books/index.ejs', {
+      allBooks: books
+    })
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+// * New
+app.get('/books/new', (req, res) => {
+  return res.render('books/new.ejs')
+})
+
+// * Edit
+app.get('/books/:bookId/edit', async (req, res) => {
+  const { bookId } = req.params
+  const book = await Book.findById(bookId)
+  return res.render('books/edit.ejs', { book })
+})
+
+// * Show
+app.get('/books/:bookId', async (req, res) => {
+  try {
+    const { bookId } = req.params
+    const book = await Book.findById(bookId)
+    return res.render('books/show.ejs', { book })
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+// * Create
+app.post('/books', async (req, res) => {
+  try {
+    const createdBook = await Book.create(req.body)
+    return res.redirect(`/books/${createdBook._id}`)
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+// * Delete
+app.delete('/books/:bookId', async (req, res) => {
+  try {
+    const { bookId } = req.params
+    const deletedBook = await Book.findByIdAndDelete(bookId)
+    console.log(`Deleted ${deletedBook.title}`)
+    return res.redirect('/books')
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+// * Update
+app.put('/books/:bookId', async (req, res) => {
+  try {
+    const { bookId } = req.params
+    await Book.findByIdAndUpdate(bookId, req.body)
+    return res.redirect(`/books/${bookId}`)
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+const init = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI)
+    console.log('🔒 Database connection established')
+    app.listen(port, () => console.log(`🚀 Server up and running on port ${port}`))
+  } catch (error) {
+    console.log(error)
+  }
+}
+init()

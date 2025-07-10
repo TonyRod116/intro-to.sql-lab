@@ -2,15 +2,18 @@ import express from 'express'
 import mongoose from 'mongoose'
 import morgan from 'morgan'
 import 'dotenv/config'
+import methodOverride from 'method-override'
 
 const app = express();
 const port = 3000;
 
 app.set('view engine', 'ejs');
-app.set('views', './views');
+
 
 app.use(express.urlencoded());
 app.use(morgan('dev'));
+app.use(methodOverride('_method'))
+
 
 const professionalSchema = new mongoose.Schema({
   type: { type: String, required: true },
@@ -40,35 +43,82 @@ const Professional = mongoose.model('Professional', professionalSchema);
 //   console.log('Response:', response)
 // }
 
+// Home Page
 app.get('/', (req, res) => {
   res.redirect('/professionals');
 });
 
-
+// INDEX
 app.get('/professionals', async (req, res) => {
-  const professionals = await Professional.find();
-  res.render('index', { professionals });
+  try {
+    const professionals = await Professional.find();
+    return res.render('pros/index', { professionals });
+  } catch (error) {
+    console.log(error)
+  }
 });
 
-app.get('/professionals/:id', async (req, res) => {
-  const professional = await Professional.findById(req.params.id);
-  res.render('show', { professional });
-});
-
+//NEW
 app.get('/professionals/new', (req, res) => {
-  res.render('new');
+  res.render('pros/new');
 });
 
+// EDIT
+app.get('/professionals/:profID/edit', async (req, res) => {
+  try {
+    const { profID } = req.params;
+    const professional = await Professional.findById(profID);
+    return res.render('pros/edit', { professional });
+  } catch (error) {
+    console.log(error)
+  }
+});
+
+// SHOW
+app.get('/professionals/:profID', async (req, res) => {
+  try {
+    const { profID } = req.params;
+    const professional = await Professional.findById(profID);
+    return res.render('pros/show', { professional });
+  } catch (error) {
+    console.log (error)
+  }
+});
+
+//CREATE
 app.post('/professionals', async (req, res) => {
-  const createdProfessional = await Professional.create(req.body);
-  return res.redirect(`/professionals/${createdProfessional._id}`);
+  try {
+    const createdPro = await Professional.create(req.body)
+    return res.redirect(`/professionals/${createdPro._id}`)  
+  } catch {
+    console.log(error)
+  }
 });
 
-app.get('/professionals/:id/edit', async (req, res) => {
-  const professional = await Professional.findById(req.params.id);
-  res.render('edit', { professional });
-});
+ // DELETE
+app.delete('/professionals/:profID', async (req, res) => {
+  try {
+    const { profID } = req.params;
+    const deletedPro = await Professional.findByIdAndDelete(profID)
+    console.log(`Deleted: ${deletedPro.title}`)
+    return res.redirect('/professionals')
+  } catch {
+    console.log(error)
+  }
+})
 
+
+//UPDATE
+app.put('/professionals/:profID', async (req, res) => {
+    try {
+    const { profID } = req.params;
+    const updatedPro = await Professional.findByIdAndUpdate(profID, req.body);
+    console.log(`Updated: ${updatedPro.title}`)
+    return res.redirect(`/professionals/${profID}`)
+  } catch (error) {
+    console.log (error)
+  }
+});
 
 
 const init = async () => {
