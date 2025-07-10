@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professionals Homepage</title>
+</head>
+<body>
+    <h1>Professionals</h1>
+    <a href="/professionals/new">New Professional</a>
+    <ul>
+        <% professionals.forEach(professional => { %>
+            <li>
+                <a href="/professionals/<%= professional._id %>">
+                    <%= professional.name %> - <%= professional.type %>
+                </a>
+            </li>
+        <% }) %>
+    </ul>
+</body>
+</html>
