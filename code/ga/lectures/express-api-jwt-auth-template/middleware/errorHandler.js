@@ -14,9 +14,10 @@ const logError = (err) => {
 
 
 const errorHandler = (err, req, res, next) => {
+  logError(err)
   if (err.name === 'InvalidDataError') {
     return res.status(err.status).json(err.response)
-    
+  }
     // * Mongoose Validation Error
   if (err.name === 'ValidationError') {
   const response = {}
@@ -37,7 +38,7 @@ if (err.name === 'MongoServerError' && err.code === 11000) {
   })
 }
 // * Unautorhized
-if (err.name === 'UnauthorizedError') {
+if (err.name === 'UnauthorizedError' || err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError')  {
   return res.status(401).json({ message: 'Unauthorized' })
 }
 
@@ -46,12 +47,8 @@ if (err.name === 'UnauthorizedError') {
 return res.status(500).json({ message: 'Internal Server Error' })
 
 
-  
-  } else {
-    logError(err)
-    res.status(500).json({ message: 'Internal server error' })
-  }
-  next(err)
+
 }
+
 
 export default errorHandler

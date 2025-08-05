@@ -1,8 +1,11 @@
 import User from '../models/user.js'
 import express from 'express'
-import { InvalidDataError } from '../utils/errors.js'
+import { InvalidDataError, UnauthorizedError } from '../utils/errors.js'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
+import verifyToken from '../middleware/verifyToken.js'
+import { generateToken } from '../utils/tokens.js'
+
 
 const router = express.Router()
 
@@ -21,19 +24,15 @@ router.post('/sign-up', async (req, res, next) => {
     const newUser = await User.create({ username, email, password })
 
     // JWT user info token
-    const token = generateToken(foundUser)
+    const token = generateToken(newUser)
 
     // Send the response to the client
-    res.status(201).json({token:token})
+    return res.status(201).json({token:token})
 
-    // responded message
-    res.status(201).json({
-      message: 'User created successfully',
-      user: newUser,
-      token
-    })
+
+
   } catch (error) {
-        res.status(500).json({ message: error.message })
+    next(error)
     }
 })
 
@@ -42,7 +41,7 @@ router.post('/sign-up', async (req, res, next) => {
 router.post('/sign-in', async (req, res, next) => {
   try {
     //search for the user by username OR email
-const foundUser = await User.findOne({$or:[{username:req.body.username},{email:req.body.email}]})
+const foundUser = await User.findOne({$or:[{username:req.body.identifier},{email:req.body.identifier}]})
 
     if (!foundUser) {throw new UnauthorizedError('User not found')}
 
@@ -55,7 +54,7 @@ const foundUser = await User.findOne({$or:[{username:req.body.username},{email:r
 const token = generateToken(foundUser)
 
 // send the response to the client
-    res.status(200).json({token:token})
+    // res.status(200).json({token:token})
 
     // responded message
     res.status(200).json({
@@ -64,11 +63,9 @@ const token = generateToken(foundUser)
       token
     })
   } catch (error) {
-    res.status(500).json({ message: error.message })
+    next(error)
   }
 })
-
-
 
 
 
