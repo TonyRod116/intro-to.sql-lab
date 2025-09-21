@@ -1,0 +1,57 @@
+/* Golden Button Effects - Solid Gold with Light Sweep */
+
+/* Make buttons solid gold with original color - preserve original typography */
+.elementor-button,
+.ast-custom-button {
+    position: relative;
+    overflow: hidden;
+    background: #B09B45 !important;
+    color: #ffffff !important;
+    border: 2px solid #B09B45 !important;
+    transition: all 0.3s ease;
+}
+
+/* Remove any glow effects on hover */
+.elementor-button:hover,
+.ast-custom-button:hover {
+    background: #B09B45 !important;
+    color: #ffffff !important;
+    border: 2px solid #B09B45 !important;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Light sweep effect - white light crossing from left to right */
+.elementor-button::before,
+.ast-custom-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.8),
+        transparent
+    );
+    transition: left 0.6s ease;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.elementor-button:hover::before,
+.ast-custom-button:hover::before {
+    left: 100%;
+}
+
+/* Remove all other effects - only keep the light sweep */
+
+/* Ensure text is visible on gold background - preserve original typography */
+.elementor-button-text,
+.ast-custom-button {
+    position: relative;
+    z-index: 2;
+    color: #ffffff !important;
+}
